@@ -35,6 +35,27 @@ class AuthJwtCsrf():
             raise HTTPException(status_code=401, detail='The JWT has expired')
         except jwt.InvalidTokenError as e:
             raise HTTPException(status_code=401, detail='Invalid token')
+        
+    def verify_jwt(self, request) -> str:
+        token = request.cookies.get('access_token')
+        if not token:
+            raise HTTPException(status_code=401, detail='No JWR exists: may not be set yet or deleted')
+        _, _, value = token.partition(' ')
+        subject = self.decode_jwt(value)
+        return subject
+        
+    def verify_update_jwt(self, request) -> tuple[str, str]:
+        subject = self.verify_jwt(request)
+        new_token = self.encode_jwt(subject)
+        return subject, new_token
+        
+    def verify_csrf_update_jwt(self, request, csrf_protect, headers) -> str:
+        csrf_token = csrf_protect.get_csrf_token_from_headers(headers)
+        csrf_protect.validate_csrf(csrf_token, request)
+        subject = self.verify_jwt(request)
+        new_token = self.encode_jwt(subject)
+        return new_token
+            
     
 
 

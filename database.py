@@ -4,13 +4,17 @@ import motor.motor_asyncio
 from bson import ObjectId
 from auth_utils import AuthJwtCsrf
 from fastapi import HTTPException
+import asyncio 
 
 MONGO_API_KEY = config('MONGO_API_KEY')
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_API_KEY)
+client.get_io_loop = asyncio.get_event_loop
+
 database = client.API_DB
 collection_user = database.User
 collection_todo = database.Todo
+
 auth = AuthJwtCsrf()
 
 def todo_serializer(todo) -> dict:
