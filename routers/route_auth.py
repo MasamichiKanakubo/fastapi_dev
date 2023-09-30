@@ -21,7 +21,7 @@ def get_csrf_token(csrf_protect: CsrfProtect = Depends()):
 @router.post('/api/register', response_model=UserInfo)
 async def signup(user: UserBody, request: Request, csrf_protect: CsrfProtect = Depends()):
     csrf_token = csrf_protect.get_csrf_from_headers(request)
-    csrf_protect.validate_csrf(csrf_token, request)
+    csrf_protect.validate_csrf(csrf_token)
     user = jsonable_encoder(user)
     new_user = await db_signup(user)
     return new_user
@@ -30,7 +30,7 @@ async def signup(user: UserBody, request: Request, csrf_protect: CsrfProtect = D
 @router.post('/api/login', response_model=SuccessMsg)
 async def login(user: UserBody, response: Response, request: Request, csrf_protect: CsrfProtect = Depends()):
     csrf_token = csrf_protect.get_csrf_from_headers(request)
-    csrf_protect.validate_csrf(csrf_token, request)
+    csrf_protect.validate_csrf(csrf_token)
     user = jsonable_encoder(user)
     token = await db_login(user)
     response.set_cookie(
@@ -42,7 +42,7 @@ async def login(user: UserBody, response: Response, request: Request, csrf_prote
 @router.post('/api/logout', response_model=SuccessMsg)
 def logout(response: Response, request: Request, csrf_protect: CsrfProtect = Depends()):
     csrf_token = csrf_protect.get_csrf_from_headers(request)
-    csrf_protect.validate_csrf(csrf_token, request)
+    csrf_protect.validate_csrf(csrf_token)
     response.set_cookie(
         key='access_token', value='', samesite='none', secure=True, httponly=True
     )
