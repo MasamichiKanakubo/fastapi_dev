@@ -3,6 +3,8 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from decouple import config
+from typing import Tuple
+
 
 JWT_KEY = config('JWT_KEY')
 
@@ -44,7 +46,7 @@ class AuthJwtCsrf():
         subject = self.decode_jwt(value)
         return subject
         
-    def verify_update_jwt(self, request) -> tuple(str, str):
+    def verify_update_jwt(self, request) -> Tuple[str, str]:
         subject = self.verify_jwt(request)
         new_token = self.encode_jwt(subject)
         return subject, new_token
